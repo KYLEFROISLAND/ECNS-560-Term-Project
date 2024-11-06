@@ -88,12 +88,17 @@ graph1_data = merged_bison_data |>
 graph2_data = merged_bison_data |>
   filter(state_code == "MONTANA" | state_code == "WYOMING" | state_code == "NORTH DAKOTA" | state_code == "SOUTH DAKOTA" | state_code == "NEBRASKA" | state_code == "KANSAS" | state_code == "OKLAHOMA" | state_code == "TEXAS" | state_code == "IDAHO" | state_code == "COLORADO" | state_code == "NEW MEXICO")
 
+graph3_data = merged_bison_data |>
+  filter(state_code == "TEXAS")
+
+#Some major state populations... all trends look different
 ggplot(graph1_data, aes(x = year, y = total_population)) +
   geom_point() +
   geom_smooth() +
   labs(title = "Bison Population by State - Some Major Locations", x = "Year", y = "Bison Population") +
   facet_wrap(~state_code)
 
+#Overall trends across the great plains... see downward trend overall
 ggplot(graph2_data, aes(x = year, y = total_population)) + 
   xlab("Year") +
   ylab("Population") +
@@ -101,16 +106,21 @@ ggplot(graph2_data, aes(x = year, y = total_population)) +
   geom_point(aes(color = state_code), size = 3) +
   geom_smooth()
 
-ggplot(graph2_data, aes(x = year, y = `Gross Cost - Hunting Licenses`)) + 
+#Number of Hunting licenses Over Time
+ggplot(graph2_data, aes(x = year, y = `Paid Hunting License Holders`)) + 
   xlab("Year") +
   ylab("Population") +
-  labs(title = "Gross Cost of Hunting Licenses Over Time") +
+  labs(title = "Number of Licenses Over Time") +
   geom_point(aes(color = state_code), size = 3) +
   geom_smooth()
 
 #Looking for relationship between number of hunting licenses and population
 ggplot(merged_bison_data, aes(x = `Paid Hunting License Holders`, y = total_population)) +
-  geom_point() + geom_smooth()
+  geom_point() + 
+  geom_smooth() +
+  xlab("Number of Lisense Holders") +
+  ylab("Population") +
+  labs(title = "Number of Licenses vs Population")
 ```
 
 Saki's Plots:

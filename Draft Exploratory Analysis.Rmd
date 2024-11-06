@@ -97,9 +97,12 @@ deduced from our range spatial data if necessary.
 
 What we see from the initial visualization is that there seems to be a general downward trend in Bison population from 2002 to 2017, but that there is no obvious trend between sates in between. In other words, while all states ultimately have lower population numbers in 2017 than in 2002, there is fluctuation in between those years in which some states saw relatively steady decline (such as Montana), others saw sharp drops amidst periods of steady decline (such as North Dakota), and some even saw short periods of population growth (such as South Dakota and Wyoming).
 
-  After realizing that there is some variety in the details of population growth or decline across states, we sought to confirm our suspician that the overall population trend is negative. What we see in the following graph is a confirmation of that suspicion, where population sees a strong downward trend across the Great Plains:
+  After realizing that there is some variety in the details of population growth or decline across states, we sought to confirm our suspicion that the overall population trend is negative. What we see in the following graph is a confirmation of that suspicion, where population sees a strong downward trend across the Great Plains:
 ![Great Plains Population Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Population Over Time.png)
 
+  As a side note, our decision to restrict our focus to the Great Plains was based off of our spatial data which indicates to us that the majority of Bison herds are concentrated in these states, as shows in the following image:
+![Bison Herds in the U.S.](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Range Map.png)
+ 
   Once we confirmed that population is indeed declining, we started exploring fluctuations in hunting license numbers as a possible correlate. The following graph shows the number of hunting licenses across the same years and the same states as our previous visual:
 ![Great Plains Hunting License Numbers Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Hunting Licenses Over Time.png)
 
