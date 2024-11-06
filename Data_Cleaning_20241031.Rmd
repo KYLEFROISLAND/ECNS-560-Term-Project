@@ -16,10 +16,11 @@ library(raster)
 library(rvest)
 library(units)
 library(dplyr)
+library(ggplot2)
 
 setwd("C:/Users/kdfro/Documents/MSU/ECNS 560/Term Project")
 Bison_numbers <- read_csv("Data/Bison_numbers_by_the_county National Bison Association.csv")
-#hunting_data_tidy <- read_excel("Data/hunting_data_tidy.xlsx")
+hunting_data_tidy <- read_excel("Data/hunting_data_tidy.xlsx")
 ```
 
 Create Tidy Version of Population Data:
@@ -73,19 +74,39 @@ ranges = st_read("Data/Bison Range Map/mBISOx_CONUS_Range_2001v1/mBISOx_CONUS_Ra
 Quick Spatial Plot:
 ```{r}
 qtm(ranges)
+qtm(habitats)
 ```
 
 
 Additional Visualizations:
+
 ```{r}
 #Comparing population change over time across some Great Plains states
 graph1_data = merged_bison_data |>
   filter(state_code == "MONTANA" | state_code == "WYOMING" | state_code == "NORTH DAKOTA" | state_code == "SOUTH DAKOTA")
 
+graph2_data = merged_bison_data |>
+  filter(state_code == "MONTANA" | state_code == "WYOMING" | state_code == "NORTH DAKOTA" | state_code == "SOUTH DAKOTA" | state_code == "NEBRASKA" | state_code == "KANSAS" | state_code == "OKLAHOMA" | state_code == "TEXAS" | state_code == "IDAHO" | state_code == "COLORADO" | state_code == "NEW MEXICO")
+
 ggplot(graph1_data, aes(x = year, y = total_population)) +
   geom_point() +
-  labs(title = "Bison Population by State", x = "Year", y = "Bison Population") +
+  geom_smooth() +
+  labs(title = "Bison Population by State - Some Major Locations", x = "Year", y = "Bison Population") +
   facet_wrap(~state_code)
+
+ggplot(graph2_data, aes(x = year, y = total_population)) + 
+  xlab("Year") +
+  ylab("Population") +
+  labs(title = "Bison Population Over Time") +
+  geom_point(aes(color = state_code), size = 3) +
+  geom_smooth()
+
+ggplot(graph2_data, aes(x = year, y = `Gross Cost - Hunting Licenses`)) + 
+  xlab("Year") +
+  ylab("Population") +
+  labs(title = "Gross Cost of Hunting Licenses Over Time") +
+  geom_point(aes(color = state_code), size = 3) +
+  geom_smooth()
 
 #Looking for relationship between number of hunting licenses and population
 ggplot(merged_bison_data, aes(x = `Paid Hunting License Holders`, y = total_population)) +
