@@ -104,7 +104,7 @@ What we see from the initial visualization is that there seems to be a general d
 ![Bison Herds in the U.S.](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Range Map.png)
  
   Once we confirmed that population is indeed declining, we started exploring fluctuations in hunting license numbers as a possible correlate. The following graph shows the number of hunting licenses across the same years and the same states as our previous visual:
-![Great Plains Hunting License Numbers Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Hunting Licenses Over Time.png)
+![Great Plains Hunting License Numbers Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Licenses Over Time Fixed.png)
 
 From this graph, we do not see any obvious trends in hunting licenses over time across the Great Plains. The following graph confirms our suspician that there is not an obvious correlation between hunting licenses and Bison population overall (population fluctuates in both directions as the number of hunting licenses increases):
 ![Hunting License Numbers vs Population Over Time](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/License vs Population.png)

@@ -64,7 +64,7 @@ Load Map Data from Shapefile:
 setwd("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project")
 
 #Load Habitats:
-habitats = raster("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Data/USGS Bison Habitat Map/mBISOx_CONUS_HabMap_2001v1/mBISOx_CONUS_HabMap_2001v1.tif")
+#habitats = raster("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Data/USGS Bison Habitat Map/mBISOx_CONUS_HabMap_2001v1/mBISOx_CONUS_HabMap_2001v1.tif")
 
 #Load Ranges:
 ranges = st_read("Data/Bison Range Map/mBISOx_CONUS_Range_2001v1/mBISOx_CONUS_Range_2001v1.shp")
