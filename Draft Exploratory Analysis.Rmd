@@ -98,23 +98,32 @@ deduced from our range spatial data if necessary.
 What we see from the initial visualization is that there seems to be a general downward trend in Bison population from 2002 to 2017, but that there is no obvious trend between sates in between. In other words, while all states ultimately have lower population numbers in 2017 than in 2002, there is fluctuation in between those years in which some states saw relatively steady decline (such as Montana), others saw sharp drops amidst periods of steady decline (such as North Dakota), and some even saw short periods of population growth (such as South Dakota and Wyoming).
 
   After realizing that there is some variety in the details of population growth or decline across states, we sought to confirm our suspicion that the overall population trend is negative. What we see in the following graph is a confirmation of that suspicion, where population sees a strong downward trend across the Great Plains:
-![Great Plains Population Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Population Over Time.png)
+![Great Plains Population Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/bison pop over time by state and binned.png)
+In this plot, each point on this plot represents a state for a given year, and the color represents the population bin that the state falls into.
 
   As a side note, our decision to restrict our focus to the Great Plains was based off of our spatial data which indicates to us that the majority of Bison herds are concentrated in these states, as shows in the following image:
-![Bison Herds in the U.S.](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Range Map.png)
+![Bison Herds in the U.S.](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/States of interest and ranges map.png)
  
   Once we confirmed that population is indeed declining, we started exploring fluctuations in hunting license numbers as a possible correlate. The following graph shows the number of hunting licenses across the same years and the same states as our previous visual:
-![Great Plains Hunting License Numbers Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Licenses Over Time Fixed.png)
+![Great Plains Hunting License Numbers Over Time - Overall Trend](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/licenses over time 2.png)
+Note that we removed texas from this graph. It was an extreme value which extended our y-axis greatly. We noted that Texas had some variation from 2010 to 2017 which is useful for us, however it was excluded from the graph in order to better demonstrate variation in other states and make the plots more interpretable.
 
-From this graph, we do not see any obvious trends in hunting licenses over time across the Great Plains. The following graph confirms our suspician that there is not an obvious correlation between hunting licenses and Bison population overall (population fluctuates in both directions as the number of hunting licenses increases):
-![Hunting License Numbers vs Population Over Time](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/License vs Population.png)
+  From this graph, we do not see any obvious trends in hunting licenses over time across most states in the Great Plains. The following graph confirms our suspicion that there is not an obvious correlation between hunting licenses and Bison population overall (population fluctuates in both directions as the number of hunting licenses increases):
+![Hunting License Numbers vs Population Over Time](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/license vs population 2.png)
 
   Although there is not an obvious and immediate relationship with our initial visualizations, it is still possible that we could find a relationship if we can find quick changes in the number of licenses in certain areas to exploit. Thus, in the following graph we explored the number of licenses in various states to see if any saw rapid increases or decreases in hunting licenses:
 ![Hunting Licenses by State](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Hunting Licenses by State.png)
 
-From this visualization, we see that most states do not have significant fluctuations in their number of hunting licenses. However, Texas saw an upward trend in licenses from 2012 to 2017. The following plot explores the relationship between the increase in hunting licenses and population changes in Texas:
+From this visualization, we see that most states do not have significant variation in their number of hunting licenses. However, Texas saw an upward trend in licenses from 2012 to 2017. The following plot explores the relationship between the increase in hunting licenses and population changes in Texas:
 ![License vs Population in Texas](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/License vs Population in Texas.png)
 
 The data does not seem to indicate a linear relationship. This could be due to a variety of reasons, including the possibility that an increase in the number of hunting licenses does not necessarily mean that there is an increase in the amount of Bison hunting (as the licenses could be for any number of animals).
 
+  The other state that saw some variation in the number of hunting licenses issued is Oklahoma, as shown below:
+![License vs Population in Texas](C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Visuals/Oklahoma Hunting vs Pop.png)
+Although we still lack sufficient evidence to infer causality between the two variables, Oklahoma at least demonstrates a negative relationship between hunting licenses and Bison population.  
+
+  We initially expected a negative relationship between hunting licenses and bison populations as a consequence of overhunting a common pool resource across all states. If states were to issue more licenses, we thought that this would ultimately mean that populations decrease as a consequence of more bison being killed by hunters. We believe that this relationship is not so obvious for two main reasons. First, the allocation of hunting licenses is heavily regulated at the state level in order to prevent a tragedy of the commons. Second, a state's capacity to maintain large Bison populations is dependent on the amount of land that the animals have to graze. Thus, an increase in the number of hunting licenses issued could in fact be an indicator of an increased amount of private hunting land. As the demand for Bison tags increases, it raises the opportunity cost of ranchers with land adjacent to bison ranges and incentives them to allow Bison to expand their territory. Thus, although more Bison are being hunted, there is more land available for additional growth.
+
   In further exploration, other indicators such as weather or local policy differences may be more useful indicators of population levels.
+  

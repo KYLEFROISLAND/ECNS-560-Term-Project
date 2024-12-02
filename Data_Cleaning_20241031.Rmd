@@ -17,10 +17,10 @@ library(rvest)
 library(units)
 library(dplyr)
 library(ggplot2)
+library(units)
 
-setwd("C:/Users/kdfro/Documents/MSU/ECNS 560/Term Project")
-Bison_numbers <- read_csv("Data/Bison_numbers_by_the_county National Bison Association.csv")
-hunting_data_tidy <- read_excel("Data/hunting_data_tidy.xlsx")
+Bison_numbers <- read_csv("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Data/Bison_numbers_by_the_county National Bison Association.csv")
+hunting_data_tidy <- read_excel("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Data/hunting_data_tidy.xlsx")
 ```
 
 Create Tidy Version of Population Data:
@@ -63,18 +63,50 @@ Load Map Data from Shapefile:
 ```{r}
 setwd("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project")
 
-#Load Habitats:
-#habitats = raster("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Data/USGS Bison Habitat Map/mBISOx_CONUS_HabMap_2001v1/mBISOx_CONUS_HabMap_2001v1.tif")
-
 #Load Ranges:
 ranges = st_read("Data/Bison Range Map/mBISOx_CONUS_Range_2001v1/mBISOx_CONUS_Range_2001v1.shp")
 
+#Load States:
+states = st_read("C:/Users/kdfro/Documents/MSU/GitHub/course-materials/lecture-slides/12-Spatial/data/us_states_contiguous/states_contiguous.shp")
+```
+Merge States and Ranges:
+```{r}
+#Check CRS
+st_crs(states)
+st_crs(ranges)
+
+#Transform/Project:
+ranges2 = st_transform(ranges, crs = st_crs(states))
+stopifnot(st_crs(ranges2) == (st_crs(states)))
+
+tm_shape(states) + tm_polygons() +
+  tm_shape(ranges2) + tm_polygons(col = "darkgreen")
 ```
 
-Quick Spatial Plot:
+Spatial Cleaning/Exploration:
 ```{r}
-qtm(ranges)
-qtm(habitats)
+#Split ranges df into multiple polygons
+ranges3 <- st_cast(ranges2, "POLYGON")
+
+#Create variable for area
+ranges3$area = st_area(ranges3)
+
+#Change units from m^2 to km^2
+set_units(st_area(ranges3), km^2)
+
+#Visualize
+tm_shape(ranges3) + tm_polygons(col = "area") 
+
+#Select states of interest:
+states2 = states |>
+  filter(STATE == "Colorado" | STATE == "Idaho" | STATE == "Kansas" | STATE == "Montana" | STATE == "Nebraska" | STATE == "New Mexico" | STATE == "North Dakota" | STATE == "North Dakota" | STATE == "Oklahoma" | STATE == "South Dakota" | STATE == "Texas" | STATE == "Wyoming")
+
+#Find intersection of ranges and states:
+ranges_intersect = st_filter(ranges3, states2)
+
+#Visualize:
+tm_shape(states2) + tm_polygons() +
+  tm_shape(ranges_intersect) + tm_polygons(col = "darkgreen")
 ```
 
 
@@ -86,10 +118,14 @@ graph1_data = merged_bison_data |>
   filter(state_code == "MONTANA" | state_code == "WYOMING" | state_code == "NORTH DAKOTA" | state_code == "SOUTH DAKOTA")
 
 graph2_data = merged_bison_data |>
-  filter(state_code == "MONTANA" | state_code == "WYOMING" | state_code == "NORTH DAKOTA" | state_code == "SOUTH DAKOTA" | state_code == "NEBRASKA" | state_code == "KANSAS" | state_code == "OKLAHOMA" | state_code == "TEXAS" | state_code == "IDAHO" | state_code == "COLORADO" | state_code == "NEW MEXICO")
+  filter(state_code == "MONTANA" | state_code == "WYOMING" | state_code == "NORTH DAKOTA" | state_code == "SOUTH DAKOTA" | state_code == "NEBRASKA" | state_code == "KANSAS" | state_code == "OKLAHOMA" | state_code == "IDAHO" | state_code == "COLORADO" | state_code == "NEW MEXICO") |>
+  mutate(population_bin = cut(total_population, breaks = c(0, 2000, 5000, 10000), labels = c("0-2000", "2000-5000", "5000-10000")))
 
 graph3_data = merged_bison_data |>
   filter(state_code == "TEXAS")
+
+graph4_data = merged_bison_data |>
+  filter(state_code == "OKLAHOMA")
 
 #Some major state populations... all trends look different
 ggplot(graph1_data, aes(x = year, y = total_population)) +
@@ -101,26 +137,37 @@ ggplot(graph1_data, aes(x = year, y = total_population)) +
 #Overall trends across the great plains... see downward trend overall
 ggplot(graph2_data, aes(x = year, y = total_population)) + 
   xlab("Year") +
-  ylab("Population") +
+  ylab("Population by State") +
   labs(title = "Bison Population Over Time") +
-  geom_point(aes(color = state_code), size = 3) +
+  geom_point(aes(color = population_bin), size = 3) +
   geom_smooth()
+#Each point on this plot represents a state for a given year, and the color represents the population bin that the state falls into.
 
 #Number of Hunting licenses Over Time
 ggplot(graph2_data, aes(x = year, y = `Paid Hunting License Holders`)) + 
   xlab("Year") +
-  ylab("Population") +
+  ylab("Number of Licenses") +
   labs(title = "Number of Licenses Over Time") +
-  geom_point(aes(color = state_code), size = 3) +
-  geom_smooth()
+  geom_point(aes(color = state_code), size = 3)
+#Removed Texas from this plot because it was an extreme value and make the graph less interpretable by extending the y-axis so much. Texas saw a small increase over the last time period but was otherwise steady.
 
 #Looking for relationship between number of hunting licenses and population
 ggplot(merged_bison_data, aes(x = `Paid Hunting License Holders`, y = total_population)) +
   geom_point() + 
   geom_smooth() +
   xlab("Number of Lisense Holders") +
-  ylab("Population") +
+  ylab("Bison Population") +
   labs(title = "Number of Licenses vs Population")
+#Not a clear relationship. With so many states there are too many competing factors at play to control for with our limited data.
+
+#What about just Oklahoma since it is one of the only states with increasing numbers of licenses?
+ggplot(graph4_data, aes(x = `Paid Hunting License Holders`, y = total_population)) +
+  geom_point() + 
+  xlab("Number of Lisense Holders") +
+  ylab("Bison Population") +
+  labs(title = "Number of Licenses vs Population for Oklahoma")
+#We still have not inferred causality, but there seems to be a negative relationship now. The lack of variation in hunting licenses across other states makes regression extremely difficult, but Oklahoma could be a better case study.
+
 ```
 
 Saki's Plots:
@@ -217,4 +264,3 @@ ggplot(data_long %>% filter(state_code == "MONTANA"), aes(x = Year, y = Count, c
        color = "License Type") +
   theme_minimal()
 ```
-
