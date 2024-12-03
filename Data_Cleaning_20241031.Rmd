@@ -180,6 +180,163 @@ ggplot(graph4_data, aes(x = `Paid Hunting License Holders`, y = total_population
   labs(title = "Number of Licenses vs Population for Oklahoma")
 #We still have not inferred causality, but there seems to be a negative relationship now. The lack of variation in hunting licenses across other states makes regression extremely difficult, but Oklahoma could be a better case study.
 
+<<<<<<< Updated upstream
+=======
+```
+
+Research Question 1: Can we predict percent decrease in population levels based on Latitude of their centroid (Proxied by proximity to Saskatchewan)?
+```{r}
+#Load Canada Shapefile:
+Canada = st_read("C:/Users/kdfro/Documents/MSU/GitHub/ECNS-560-Term-Project/Data/ca_shp/ca.shp")
+
+#Convert GRS:
+Canada2 = st_transform(Canada, crs = st_crs(states2))
+stopifnot(st_crs(Canada2) == (st_crs(states2)))
+
+#Find Centroids of states of interest:
+state_centroids = st_centroid(states2)
+
+#Plot to confirm:
+tm_shape(states2) + tm_borders() +
+  tm_shape(states2) + tm_dots(col = "red")
+
+#Make a variable for proximity of centroid to Saskatchewan:
+distance_pop_data = state_centroids |>
+  mutate(distance = st_distance(state_centroids$geometry, Canada2[3,4]))
+
+#Merge data with population, create variables for distance from Canada and population decline:
+distance = as.data.frame(distance_pop_data) |>
+  rename(state_code = STATE) |>
+  mutate(state_code = toupper(state_code)) |>
+  left_join(bison_data_merge, by = "state_code") |>
+  group_by(state_code) |>
+  mutate(difference = abs(total_population - total_population[year == 2002])/total_population[year == 2002]) |> #I use percent decrease in order to help control for variability in absolute levels
+  filter(year == 2017)
+
+#Plot Proximity vs Population Decrease:
+ggplot(distance, aes(x = log(distance), y = difference)) + 
+  xlab("log(distance) from Canada") +
+  ylab("Percent Decrease in Bison Population") +
+  labs(title = "Latitude and Bison Population Decline") +
+  geom_point()
+
+#Plot with Regression Line:
+ggplot(distance, aes(x = log(distance), y = difference)) + 
+  xlab("log(distance) from Canada") +
+  ylab("Percent Decrease in Bison Population") +
+  labs(title = "Latitude and Bison Population Decline") +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+#Descriptive Regression:
+lat_pop_model <- lm(difference ~ log(distance), data = distance)
+tidy(lat_pop_model, conf.int = T) 
+#We see that this model estimates a 1% increase in distance from Canada (ie further south) is correlated with a 0.08% smaller decrease in Bison population (ie, the further south the state is, the less its population has decreased between 2002 and 2017). However, this estimate is not reliable at any meaningful level as it is only statistically significant around the 50% level.
+
+```
+
+Research Question 2: How does the percentage of land that is public impact Bison population levels?
+```{r}
+#Scrape Census Dataset
+url = "https://www.summitpost.org/public-and-private-land-percentages-by-us-states/186111"
+page = read_html(url)
+
+selector = "#globalWrapper > div.view-object > div.container-fluid.view-object-main > div > div.object-content > div > div.full-content > noformat:nth-child(3) > div"
+land = page |> 
+  html_elements(selector) |>
+  html_table()
+
+land_data = as.data.frame(land)
+
+#Fix Column Names:
+library(janitor)
+land_data2 <- janitor::row_to_names(land_data, row_number = 1)
+land_data3 = land_data2 |>
+  rename(ABBREV = State) |>
+  rename(public = '% that is Public Land') |>
+  rename(private = '% that is Private Land') 
+
+#String Clean:
+land_data3$private <- sub("%$", "", land_data3$private)
+land_data3$private <- sub("%$", "", land_data3$private)
+
+#Make Columns Numeric:
+land_data4 = land_data3 |>
+  mutate_at(c('public', 'private'), as.numeric)
+
+#Merge Distance data set with hunting data:
+distance_hunting = left_join(distance, hunting_data_tidy, by = c("state_code" = "state_code", "year" = "year")) |> as.data.frame()
+#I could have made this code more efficient by combining with the next few lines, but after rearranging some chunks i just copied and pasted this in.
+
+#Merge Data with hunting and population:
+distance_hunting_land = left_join(distance_hunting, land_data4, by = ("ABBREV" = "ABBREV"))
+
+#Initial Plot of Bison Population Decline vs % of land that is Public:
+ggplot(distance_hunting_land, aes(x = public, y = difference)) + 
+  xlab("% of Land that is Public") +
+  ylab("Percent Decrease in Bison Population") +
+  labs(title = "Public Land Share and Bison Population Decline") +
+  geom_point() 
+
+#There is not an obvious relationship here, but what if we remove Idaho and Montana?
+distance_hunting_land2 = distance_hunting_land |>
+  filter(ABBREV != "ID") |>
+  filter(ABBREV != "MT")
+#Removing these states is justified because... Yellowstone herds moving between states? private land owners shifting herds between states? Need to look at documentation.
+
+#Plot with Regression Line:
+ggplot(distance_hunting_land2, aes(x = public, y = difference)) + 
+  xlab("% of Land that is Public") +
+  ylab("Percent Decrease in Bison Population") +
+  labs(title = "Public Land Share and Bison Population Decline") +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+#Descriptive Regression:
+land_pop_model <- lm(difference ~ public, data = distance_hunting_land2)
+tidy(land_pop_model, conf.int = T) 
+```
+
+Research Question 3: Can we predict population decline using Location, Hunting Data, and Public Land Percentage? 
+```{r}
+library(tidymodels)
+library(ISLR)
+library(glmnet)
+ 
+#Create Predictive Model:
+#First, split into train and test data
+set.seed(123)
+bison_split = distance_hunting_land2 |> initial_split(prop = 0.7)
+bison_train = distance_hunting_land2 |> training()
+bison_test = distance_hunting_land2 |> testing()
+
+#Define a Recipe:
+bison_recipe = recipe(difference ~ distance + total_population + 'Paid Hunting License Holders' + public, data = bison_train) |> 
+  update_role(GEOID, new_role = "id") |> 
+  step_poly(all_numeric_predictors(), degree = 2) |> #create second term for each numeric var that is a quadratic
+  step_interact(~all_numeric_predictors():all_nominal_predictors()) |> #create interactions between numeric and indicator variables
+  step_dummy(all_nominal_predictors()) |> #create indicators for each categorical or character variable
+  step_nzv(all_predictors())#remove predictors with nearly 0 variance... otherwise not very reliable because difficult to pickup patterns
+
+#Process the Data:
+bison_clean = bison_recipe |> prep() |> juice() 
+
+#Define linear model:
+model_lm = linear_reg() |> set_engine("lm") 
+
+#Define cross validation for experimentation with other regression forms later
+bison_cv = bison_train |> vfold_cv(v=5)
+
+#Define Workflow:
+fit_lm_cv = workflow() |>
+  add_model(model_lm) |>
+  add_recipe(bisont_recipe) |>
+  fit_resamples(bison_cv)
+
+#Fit Model:
+fit_lm_cv |> collect_metrics(summarize = F)
+
+>>>>>>> Stashed changes
 ```
 
 Research Question 1: Can we predict percent decrease in population levels based on Latitude of their centroid (Proxied by proximity to Saskatchewan)?
@@ -361,6 +518,7 @@ ggplot(data_long %>% filter(state_code == "MONTANA"), aes(x = Year, y = Count, c
        color = "License Type") +
   theme_minimal()
 ```
+<<<<<<< Updated upstream
 =======
 ---
 title: "ECNS 560 Project - Bison Population"
@@ -629,3 +787,5 @@ ggplot(data_long %>% filter(state_code == "MONTANA"), aes(x = Year, y = Count, c
   theme_minimal()
 ```
 >>>>>>> ae5d3f30ef6b3c153d8c3a489f3f9dc3d1e461cb
+=======
+>>>>>>> Stashed changes
